@@ -114,45 +114,35 @@ class SWOTVisualizer:
         gl.xlabel_style = {'size': 11}
         gl.ylabel_style = {'size': 11}
         
-        # Plot water body observations
+        # Plot water body observations with consistent size, color shows elevation
+        # Using uniform size makes elevation colors more visible
         scatter = ax.scatter(df['longitude'], df['latitude'], 
                            c=df['water_elevation_m'], 
-                           s=df['water_area_km2']*4,  # Size by area
-                           cmap='YlGnBu', alpha=0.8, edgecolors='navy', 
-                           linewidth=1, zorder=5, transform=ccrs.PlateCarree())
+                           s=80,  # Uniform size for better visibility
+                           cmap='RdYlBu_r', alpha=0.7, edgecolors='darkblue', 
+                           linewidth=0.8, zorder=5, transform=ccrs.PlateCarree(),
+                           vmin=df['water_elevation_m'].min(),
+                           vmax=df['water_elevation_m'].max())
         
-        # Colorbar
+        # Colorbar - moved to the left
         cbar = plt.colorbar(scatter, ax=ax, label='Water Elevation (m)', 
-                           fraction=0.03, pad=0.04, shrink=0.8)
-        cbar.ax.tick_params(labelsize=11)
+                           fraction=0.025, pad=0.02, shrink=0.7,
+                           orientation='vertical')
+        cbar.ax.tick_params(labelsize=10)
         
         # Title
         ax.set_title('Global SWOT Water Body Observations\nNASA Surface Water and Ocean Topography Mission', 
                     fontsize=16, fontweight='bold', pad=20)
         
-        # Add info box
+        # Add info box with stats
         info_text = f"Total Observations: {len(df)}\n"
         info_text += f"Total Water Area: {results['total_water_area_km2']:.1f} km²\n"
         info_text += f"Mean Elevation: {results['mean_elevation']:.1f} m\n"
-        info_text += f"Elevation Range: {results['min_elevation']:.1f} - {results['max_elevation']:.1f} m"
+        info_text += f"Range: {results['min_elevation']:.1f} - {results['max_elevation']:.1f} m"
         ax.text(0.02, 0.02, info_text, transform=ax.transAxes, 
                 fontsize=11, verticalalignment='bottom',
                 bbox=dict(boxstyle='round,pad=0.8', facecolor='white', 
-                         edgecolor='navy', alpha=0.95, linewidth=2.5))
-        
-        # Add legend for point sizes
-        sizes = [10, 50, 100]
-        labels = ['Small (<10 km²)', 'Medium (10-50 km²)', 'Large (>50 km²)']
-        legend_points = [plt.scatter([], [], s=s*4, c='steelblue', alpha=0.7, 
-                                    edgecolors='navy', linewidth=1) 
-                        for s in sizes]
-        legend = ax.legend(legend_points, labels, scatterpoints=1, 
-                          title='Water Body Size', loc='upper right',
-                          frameon=True, fancybox=True, shadow=True,
-                          fontsize=10, title_fontsize=11)
-        legend.get_frame().set_alpha(0.95)
-        legend.get_frame().set_edgecolor('navy')
-        legend.get_frame().set_linewidth(2)
+                         edgecolor='darkblue', alpha=0.95, linewidth=2))
         
         plt.tight_layout()
         
