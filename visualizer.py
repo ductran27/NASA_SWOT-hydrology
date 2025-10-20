@@ -8,6 +8,8 @@ import matplotlib.dates as mdates
 import pandas as pd
 import numpy as np
 from pathlib import Path
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 
 
 class SWOTVisualizer:
@@ -88,85 +90,70 @@ class SWOTVisualizer:
         return filepath
     
     def _plot_spatial_map(self, df, results):
-        """Create global spatial distribution map with continents"""
-        fig = plt.figure(figsize=(18, 10))
-        ax = fig.add_subplot(111)
+        """Create global spatial distribution map with proper coastlines and boundaries"""
+        # Create figure with Plate Carree projection
+        fig = plt.figure(figsize=(20, 10))
+        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
         
         # Set global extent
-        ax.set_xlim(-180, 180)
-        ax.set_ylim(-90, 90)
-        ax.set_aspect('equal')
+        ax.set_global()
         
-        # Set ocean background
-        ax.set_facecolor('#E8F4F8')
-        fig.patch.set_facecolor('white')
+        # Add geographic features
+        ax.add_feature(cfeature.LAND, facecolor='#F5F5DC', alpha=0.3)
+        ax.add_feature(cfeature.OCEAN, facecolor='#E8F4F8')
+        ax.add_feature(cfeature.COASTLINE, linewidth=0.8, edgecolor='#333333')
+        ax.add_feature(cfeature.BORDERS, linewidth=0.5, edgecolor='#666666', linestyle='--', alpha=0.7)
+        ax.add_feature(cfeature.LAKES, facecolor='#B3D9FF', alpha=0.5, edgecolor='#4D94FF', linewidth=0.3)
+        ax.add_feature(cfeature.RIVERS, edgecolor='#4D94FF', linewidth=0.3, alpha=0.5)
         
-        # Draw simple continent outlines (simplified approach)
-        # Draw land masses with basic shapes
-        continents = [
-            # North America
-            [(-170, 25), (-170, 70), (-50, 70), (-50, 25), (-170, 25)],
-            # South America
-            [(-80, -55), (-80, 12), (-35, 12), (-35, -55), (-80, -55)],
-            # Europe
-            [(-10, 35), (-10, 70), (40, 70), (40, 35), (-10, 35)],
-            # Africa
-            [(-20, -35), (-20, 35), (50, 35), (50, -35), (-20, -35)],
-            # Asia
-            [(40, 0), (40, 75), (180, 75), (180, 0), (40, 0)],
-            # Australia
-            [(110, -45), (110, -10), (155, -10), (155, -45), (110, -45)],
-        ]
-        
-        for continent in continents:
-            lons, lats = zip(*continent)
-            ax.fill(lons, lats, color='#D3D3D3', alpha=0.3, edgecolor='#999999', linewidth=1)
+        # Add gridlines with labels
+        gl = ax.gridlines(draw_labels=True, linewidth=0.5, color='gray', 
+                         alpha=0.5, linestyle='--')
+        gl.top_labels = False
+        gl.right_labels = False
+        gl.xlabel_style = {'size': 11}
+        gl.ylabel_style = {'size': 11}
         
         # Plot water body observations
         scatter = ax.scatter(df['longitude'], df['latitude'], 
                            c=df['water_elevation_m'], 
-                           s=df['water_area_km2']*3,  # Size by area
-                           cmap='YlGnBu', alpha=0.8, edgecolors='darkblue', 
-                           linewidth=0.8, zorder=5)
+                           s=df['water_area_km2']*4,  # Size by area
+                           cmap='YlGnBu', alpha=0.8, edgecolors='navy', 
+                           linewidth=1, zorder=5, transform=ccrs.PlateCarree())
         
         # Colorbar
         cbar = plt.colorbar(scatter, ax=ax, label='Water Elevation (m)', 
-                           fraction=0.046, pad=0.04)
-        cbar.ax.tick_params(labelsize=10)
+                           fraction=0.03, pad=0.04, shrink=0.8)
+        cbar.ax.tick_params(labelsize=11)
         
-        # Add gridlines
-        ax.grid(True, alpha=0.2, linestyle='--', linewidth=0.5, color='gray')
-        
-        # Set major gridlines
-        ax.set_xticks(np.arange(-180, 181, 30))
-        ax.set_yticks(np.arange(-90, 91, 30))
-        
-        # Labels and title
-        ax.set_xlabel('Longitude (°E)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Latitude (°N)', fontsize=13, fontweight='bold')
-        ax.set_title('Global SWOT Water Body Observations', 
+        # Title
+        ax.set_title('Global SWOT Water Body Observations\nNASA Surface Water and Ocean Topography Mission', 
                     fontsize=16, fontweight='bold', pad=20)
         
         # Add info box
         info_text = f"Total Observations: {len(df)}\n"
         info_text += f"Total Water Area: {results['total_water_area_km2']:.1f} km²\n"
-        info_text += f"Mean Elevation: {results['mean_elevation']:.1f} m"
+        info_text += f"Mean Elevation: {results['mean_elevation']:.1f} m\n"
+        info_text += f"Elevation Range: {results['min_elevation']:.1f} - {results['max_elevation']:.1f} m"
         ax.text(0.02, 0.02, info_text, transform=ax.transAxes, 
                 fontsize=11, verticalalignment='bottom',
                 bbox=dict(boxstyle='round', facecolor='white', 
-                         edgecolor='darkblue', alpha=0.9, linewidth=2))
+                         edgecolor='navy', alpha=0.95, linewidth=2.5,
+                         boxstyle='round,pad=0.8'))
         
         # Add legend for point sizes
         sizes = [10, 50, 100]
-        labels = ['Small', 'Medium', 'Large']
-        legend_points = [plt.scatter([], [], s=s*3, c='steelblue', alpha=0.6, 
-                                    edgecolors='darkblue', linewidth=0.8) 
+        labels = ['Small (<10 km²)', 'Medium (10-50 km²)', 'Large (>50 km²)']
+        legend_points = [plt.scatter([], [], s=s*4, c='steelblue', alpha=0.7, 
+                                    edgecolors='navy', linewidth=1) 
                         for s in sizes]
         legend = ax.legend(legend_points, labels, scatterpoints=1, 
                           title='Water Body Size', loc='upper right',
                           frameon=True, fancybox=True, shadow=True,
                           fontsize=10, title_fontsize=11)
-        legend.get_frame().set_alpha(0.9)
+        legend.get_frame().set_alpha(0.95)
+        legend.get_frame().set_edgecolor('navy')
+        legend.get_frame().set_linewidth(2)
         
         plt.tight_layout()
         
