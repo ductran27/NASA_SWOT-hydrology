@@ -1,0 +1,24 @@
+# Configuration for NASA SWOT Monitoring System
+
+# Data source configuration
+data_sources:
+  bounding_box: [-125, 25, -65, 50]  # US continental bounds [west, south, east, north]
+  product_type: "SWOT_L2_HR_LakeSP"  # Lake/reservoir product
+  
+# Analysis configuration
+analysis:
+  quality_threshold: "good"
+  min_area_km2: 0.1
+  min_elevation_m: -500
+  max_elevation_m: 6000
+
+# Visualization configuration
+visualization:
+  style: "seaborn"
+  dpi: 150
+  colormap: "viridis"
+
+# Schedule (for reference - actual scheduling done in GitHub Actions)
+schedule:
+  frequency: "daily"
+  time_utc: "09:00"
