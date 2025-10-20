@@ -137,9 +137,8 @@ class SWOTVisualizer:
         info_text += f"Elevation Range: {results['min_elevation']:.1f} - {results['max_elevation']:.1f} m"
         ax.text(0.02, 0.02, info_text, transform=ax.transAxes, 
                 fontsize=11, verticalalignment='bottom',
-                bbox=dict(boxstyle='round', facecolor='white', 
-                         edgecolor='navy', alpha=0.95, linewidth=2.5,
-                         boxstyle='round,pad=0.8'))
+                bbox=dict(boxstyle='round,pad=0.8', facecolor='white', 
+                         edgecolor='navy', alpha=0.95, linewidth=2.5))
         
         # Add legend for point sizes
         sizes = [10, 50, 100]
