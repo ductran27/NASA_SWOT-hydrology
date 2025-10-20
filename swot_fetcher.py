@@ -64,30 +64,48 @@ class SWOTDataFetcher:
     def _generate_sample_swot_data(self):
         """
         Generate sample SWOT-like data for demonstration
-        In production, replace with actual NASA API calls
+        Simulates inland water bodies (lakes, rivers, reservoirs) only
         """
-        # Simulate water bodies in different locations
         np.random.seed(int(datetime.now().timestamp()) % 1000)
         
-        n_features = 50  # Number of water body observations
+        # Define realistic inland water body locations (avoiding oceans)
+        # Major lake/river regions
+        regions = [
+            {'name': 'Great Lakes', 'lon': (-92, -76), 'lat': (41, 49), 'elev': (174, 184)},
+            {'name': 'Mississippi Basin', 'lon': (-95, -88), 'lat': (32, 42), 'elev': (50, 300)},
+            {'name': 'Colorado River', 'lon': (-115, -108), 'lat': (32, 40), 'elev': (200, 1200)},
+            {'name': 'California Central', 'lon': (-122, -118), 'lat': (35, 40), 'elev': (50, 400)},
+            {'name': 'Texas Lakes', 'lon': (-100, -95), 'lat': (29, 34), 'elev': (100, 500)},
+            {'name': 'Florida Everglades', 'lon': (-81, -80), 'lat': (25, 28), 'elev': (0, 10)},
+        ]
         
-        # Generate realistic water level data
-        data = {
-            'feature_id': [f'WB_{i:04d}' for i in range(n_features)],
-            'longitude': np.random.uniform(-125, -65, n_features),  # US bounds
-            'latitude': np.random.uniform(25, 50, n_features),
-            'water_elevation_m': np.random.uniform(0, 500, n_features),
-            'elevation_uncertainty_m': np.random.uniform(0.1, 2.0, n_features),
-            'water_area_km2': np.random.uniform(0.1, 100, n_features),
-            'observation_time': [datetime.now() - timedelta(hours=np.random.randint(0, 24)) 
-                                for _ in range(n_features)],
-            'quality_flag': np.random.choice(['good', 'medium', 'poor'], n_features, 
-                                            p=[0.7, 0.2, 0.1])
-        }
+        all_features = []
+        features_per_region = 8
         
-        df = pd.DataFrame(data)
+        for region in regions:
+            lon_min, lon_max = region['lon']
+            lat_min, lat_max = region['lat']
+            elev_min, elev_max = region['elev']
+            
+            lons = np.random.uniform(lon_min, lon_max, features_per_region)
+            lats = np.random.uniform(lat_min, lat_max, features_per_region)
+            elevs = np.random.uniform(elev_min, elev_max, features_per_region)
+            
+            for i in range(features_per_region):
+                all_features.append({
+                    'feature_id': f'WB_{len(all_features):04d}',
+                    'longitude': lons[i],
+                    'latitude': lats[i],
+                    'water_elevation_m': elevs[i],
+                    'elevation_uncertainty_m': np.random.uniform(0.1, 2.0),
+                    'water_area_km2': np.random.uniform(0.5, 100),
+                    'observation_time': datetime.now() - timedelta(hours=np.random.randint(0, 24)),
+                    'quality_flag': np.random.choice(['good', 'medium', 'poor'], p=[0.7, 0.2, 0.1])
+                })
         
-        print(f"  Generated {len(df)} SWOT observations")
+        df = pd.DataFrame(all_features)
+        
+        print(f"  Generated {len(df)} inland water body observations")
         return df
     
     def _save_data(self, df):
