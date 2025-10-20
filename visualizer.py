@@ -88,43 +88,92 @@ class SWOTVisualizer:
         return filepath
     
     def _plot_spatial_map(self, df, results):
-        """Create spatial distribution map"""
-        fig, ax = plt.subplots(figsize=(12, 8))
+        """Create global spatial distribution map with continents"""
+        fig = plt.figure(figsize=(18, 10))
+        ax = fig.add_subplot(111)
         
-        # Color by elevation
+        # Set global extent
+        ax.set_xlim(-180, 180)
+        ax.set_ylim(-90, 90)
+        ax.set_aspect('equal')
+        
+        # Set ocean background
+        ax.set_facecolor('#E8F4F8')
+        fig.patch.set_facecolor('white')
+        
+        # Draw simple continent outlines (simplified approach)
+        # Draw land masses with basic shapes
+        continents = [
+            # North America
+            [(-170, 25), (-170, 70), (-50, 70), (-50, 25), (-170, 25)],
+            # South America
+            [(-80, -55), (-80, 12), (-35, 12), (-35, -55), (-80, -55)],
+            # Europe
+            [(-10, 35), (-10, 70), (40, 70), (40, 35), (-10, 35)],
+            # Africa
+            [(-20, -35), (-20, 35), (50, 35), (50, -35), (-20, -35)],
+            # Asia
+            [(40, 0), (40, 75), (180, 75), (180, 0), (40, 0)],
+            # Australia
+            [(110, -45), (110, -10), (155, -10), (155, -45), (110, -45)],
+        ]
+        
+        for continent in continents:
+            lons, lats = zip(*continent)
+            ax.fill(lons, lats, color='#D3D3D3', alpha=0.3, edgecolor='#999999', linewidth=1)
+        
+        # Plot water body observations
         scatter = ax.scatter(df['longitude'], df['latitude'], 
                            c=df['water_elevation_m'], 
-                           s=df['water_area_km2']*2,  # Size by area
-                           cmap='viridis', alpha=0.6, edgecolors='black', linewidth=0.5)
+                           s=df['water_area_km2']*3,  # Size by area
+                           cmap='YlGnBu', alpha=0.8, edgecolors='darkblue', 
+                           linewidth=0.8, zorder=5)
         
         # Colorbar
-        cbar = plt.colorbar(scatter, ax=ax, label='Water Elevation (m)')
+        cbar = plt.colorbar(scatter, ax=ax, label='Water Elevation (m)', 
+                           fraction=0.046, pad=0.04)
+        cbar.ax.tick_params(labelsize=10)
+        
+        # Add gridlines
+        ax.grid(True, alpha=0.2, linestyle='--', linewidth=0.5, color='gray')
+        
+        # Set major gridlines
+        ax.set_xticks(np.arange(-180, 181, 30))
+        ax.set_yticks(np.arange(-90, 91, 30))
         
         # Labels and title
-        ax.set_xlabel('Longitude', fontsize=12)
-        ax.set_ylabel('Latitude', fontsize=12)
-        ax.set_title('SWOT Water Body Observations', fontsize=14, fontweight='bold')
-        ax.grid(True, alpha=0.3)
+        ax.set_xlabel('Longitude (°E)', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Latitude (°N)', fontsize=13, fontweight='bold')
+        ax.set_title('Global SWOT Water Body Observations', 
+                    fontsize=16, fontweight='bold', pad=20)
         
-        # Add centroid marker
-        centroid = results['spatial_stats']
-        ax.plot(centroid['centroid_lon'], centroid['centroid_lat'], 
-               'r*', markersize=15, label='Centroid')
-        ax.legend()
+        # Add info box
+        info_text = f"Total Observations: {len(df)}\n"
+        info_text += f"Total Water Area: {results['total_water_area_km2']:.1f} km²\n"
+        info_text += f"Mean Elevation: {results['mean_elevation']:.1f} m"
+        ax.text(0.02, 0.02, info_text, transform=ax.transAxes, 
+                fontsize=11, verticalalignment='bottom',
+                bbox=dict(boxstyle='round', facecolor='white', 
+                         edgecolor='darkblue', alpha=0.9, linewidth=2))
         
-        # Add info text
-        info_text = f"Observations: {len(df)}\n"
-        info_text += f"Total Area: {results['total_water_area_km2']:.1f} km²"
-        ax.text(0.02, 0.98, info_text, transform=ax.transAxes, 
-                fontsize=10, verticalalignment='top',
-                bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.7))
+        # Add legend for point sizes
+        sizes = [10, 50, 100]
+        labels = ['Small', 'Medium', 'Large']
+        legend_points = [plt.scatter([], [], s=s*3, c='steelblue', alpha=0.6, 
+                                    edgecolors='darkblue', linewidth=0.8) 
+                        for s in sizes]
+        legend = ax.legend(legend_points, labels, scatterpoints=1, 
+                          title='Water Body Size', loc='upper right',
+                          frameon=True, fancybox=True, shadow=True,
+                          fontsize=10, title_fontsize=11)
+        legend.get_frame().set_alpha(0.9)
         
         plt.tight_layout()
         
         # Save
         timestamp = pd.Timestamp.now().strftime('%Y%m%d')
         filepath = self.plots_dir / f'spatial_map_{timestamp}.png'
-        plt.savefig(filepath, dpi=150, bbox_inches='tight')
+        plt.savefig(filepath, dpi=200, bbox_inches='tight', facecolor='white')
         plt.close()
         
         return filepath
