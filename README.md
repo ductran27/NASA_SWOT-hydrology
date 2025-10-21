@@ -72,6 +72,15 @@ Generated files:
 - `plots/` - Visualization images
 - `maps/` - Spatial distribution maps
 
+## Citation
+
+If you use this tool in your research, please cite:
+
+```
+Tran, T.N.D. (2025). NASA_SWOT-hydrology. 
+https://github.com/ductran27/NASA_SWOT-hydrology
+```
+
 ## Notes
 
 Uses NASA Earthdata API for legitimate research purposes. All data is publicly available. Analysis code is original work focused on water resource monitoring.
