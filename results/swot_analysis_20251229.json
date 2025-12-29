@@ -1,32 +1,32 @@
 {
   "total_features": 48,
-  "good_quality_features": 34,
-  "mean_elevation": 284.2892587630788,
-  "median_elevation": 216.58009985942303,
-  "std_elevation": 258.2206497769417,
-  "min_elevation": 3.532936112941144,
-  "max_elevation": 1175.3124423016584,
-  "total_water_area_km2": 1564.2402474458686,
-  "elevation_change": 339.8844970658987,
+  "good_quality_features": 39,
+  "mean_elevation": 287.1817158909416,
+  "median_elevation": 242.3674422872643,
+  "std_elevation": 250.62506553870702,
+  "min_elevation": 1.5645430560130846,
+  "max_elevation": 1196.0037602230109,
+  "total_water_area_km2": 1751.8790000918636,
+  "elevation_change": 331.6061405629831,
   "spatial_stats": {
     "longitude_range": [
-      -121.93374431349024,
-      -77.4468851204461
+      -121.91697424929166,
+      -77.43105753433625
     ],
     "latitude_range": [
-      25.94466267101362,
-      48.41861441992408
+      25.228205346141323,
+      46.51532942677642
     ],
-    "centroid_lon": -99.43021148395525,
-    "centroid_lat": 35.458845683729145
+    "centroid_lon": -98.25974758154179,
+    "centroid_lat": 36.161609625650485
   },
   "quality_distribution": {
-    "good": 34,
-    "medium": 8,
-    "poor": 6
+    "good": 39,
+    "medium": 7,
+    "poor": 2
   },
-  "mean_uncertainty": 1.0952284015006974,
-  "summary": "Tracked 34 water bodies (avg elevation: 284.3 m, total area: 1564.2 km\u00b2)",
-  "analysis_date": "2025-12-29 07:32:37",
+  "mean_uncertainty": 1.0439812579095222,
+  "summary": "Tracked 39 water bodies (avg elevation: 287.2 m, total area: 1751.9 km\u00b2)",
+  "analysis_date": "2025-12-29 13:41:34",
   "observation_count": 48
 }
