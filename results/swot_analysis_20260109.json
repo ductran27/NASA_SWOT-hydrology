@@ -1,0 +1,32 @@
+{
+  "total_features": 48,
+  "good_quality_features": 31,
+  "mean_elevation": 241.0421418279696,
+  "median_elevation": 182.93102067920418,
+  "std_elevation": 219.42621695880464,
+  "min_elevation": 1.2121255162897793,
+  "max_elevation": 1159.7426838470537,
+  "total_water_area_km2": 1772.4816558078542,
+  "elevation_change": 254.89196024746147,
+  "spatial_stats": {
+    "longitude_range": [
+      -121.70698218177826,
+      -80.2872846551888
+    ],
+    "latitude_range": [
+      25.539555911460067,
+      48.39349883817669
+    ],
+    "centroid_lon": -98.83028569781492,
+    "centroid_lat": 36.11589163103955
+  },
+  "quality_distribution": {
+    "good": 31,
+    "medium": 12,
+    "poor": 5
+  },
+  "mean_uncertainty": 1.1202033354260659,
+  "summary": "Tracked 31 water bodies (avg elevation: 241.0 m, total area: 1772.5 km\u00b2)",
+  "analysis_date": "2026-01-09 03:01:10",
+  "observation_count": 48
+}
