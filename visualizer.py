@@ -66,7 +66,7 @@ class SWOTVisualizer:
         ax1.grid(True, alpha=0.3)
         
         # Box plot with uncertainty
-        ax2.boxplot(df['water_elevation_m'], vert=True)
+        ax2.boxplot(df['water_elevation_m'])
         ax2.set_ylabel('Water Elevation (m)', fontsize=11)
         ax2.set_title('Elevation Variability', fontsize=12, fontweight='bold')
         ax2.grid(True, alpha=0.3)
